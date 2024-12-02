@@ -1,7 +1,5 @@
-"use strict";
-
 // eslint-disable-next-line no-unused-vars
-const DATA_TACHES = {
+export const DATA_TACHES = {
     taches: [
         { type: "string", titreTache: "ID de la tâche" },
         { type: "string", titreTache: "Nom de la tâche" },
