@@ -1,10 +1,10 @@
 /** VOS $VARIABLES Sass ici avant l'importation**/
-$primary: #6ABDD8; 
-$secondary: #F28500;
-$body-bg: #E5EFEC;
-$info: #E5EFEC;
-$light: #AABDCA; 
-$dark: #2D353E;
+$primary: #6abdd8;
+$secondary: #f28500;
+$body-bg: #e5efec;
+$info: #e5efec;
+$light: #aabdca;
+$dark: #2d353e;
 
 /* POLICE DES TITRES */
 $headings-font-family: "Oswald";
@@ -13,13 +13,13 @@ $font-family-base: "Roboto";
 
 /*** Importation de Boostrap + POLICES **/
 @import "partials/bootstrap";
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 
 /*** Début des styles personnalisés ***/
-.mega-titre{
-    font-size: 6vw;
+.mega-titre {
+  font-size: 6vw;
 }
 
-.card-tache{
-    height:50rem;
+.card-tache {
+  height: 50rem;
 }
