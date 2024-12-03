@@ -1,11 +1,16 @@
 /**
  * Cette fonction permet Créer la structure HTML pour afficher une card à partir des paramètres.
  *
- * @param {object} pDetails - Les détails de la tâche.
+ * @param {Image} pImage - L'image de la tâche.
+ * @param {HTMLElement} pTitre - Le titre de la tâche.
+ * @param {Object} pDescription - La description de la tâche.
+ * @param {boolean} pEstAvecBouton - Si la carte doit avoir un bouton.
+ * @param {HTMLElement} pElementHTMLBouton - L'élément HTML du bouton.
  * @returns - Une carte de tâche.
  * @author - alexandre-roy
  */
-export function creerCard(pDetails) {
+export function creerCard(pImage, pTitre, pDescription, pEstAvecBouton,
+    pElementHTMLBouton) {
   let colCards = document.createElement("div");
   colCards.classList = "col-12 col-sm-6 col-lg-4";
 
@@ -14,15 +19,11 @@ export function creerCard(pDetails) {
 
   let imgCard = document.createElement("img");
   imgCard.className = "card-img-top";
-  imgCard.src = "images/checkbox.png";
+  imgCard.src = pImage;
   imgCard.classList = "w-50";
 
   let divTitre = document.createElement("div");
   divTitre.classList = "mx-3";
-
-  let titreTache = document.createElement("h2");
-  titreTache.classList = "card-title fs-5";
-  titreTache.textContent = `${pDetails.id}: ${pDetails.titre}`;
 
   let cardBody = document.createElement("div");
   cardBody.classList = "card-body py-0 d-flex align-items-center";
@@ -32,42 +33,42 @@ export function creerCard(pDetails) {
   let dtIdTache = document.createElement("dt");
   dtIdTache.textContent = "id";
   let ddIdTache = document.createElement("dd");
-  ddIdTache.textContent = pDetails.id;
+  ddIdTache.textContent = pDescription.id;
   dl.appendChild(dtIdTache);
   dl.appendChild(ddIdTache);
 
   let dtTitre = document.createElement("dt");
   dtTitre.textContent = "titre";
   let ddTitre = document.createElement("dd");
-  ddTitre.textContent = pDetails.titre;
+  ddTitre.textContent = pDescription.titre;
   dl.appendChild(dtTitre);
   dl.appendChild(ddTitre);
 
   let dtDateDebut = document.createElement("dt");
   dtDateDebut.textContent = "dateDebut";
   let ddDateDebut = document.createElement("dd");
-  ddDateDebut.textContent = pDetails.dateDebut;
+  ddDateDebut.textContent = pDescription.dateDebut;
   dl.appendChild(dtDateDebut);
   dl.appendChild(ddDateDebut);
 
   let dtDateFin = document.createElement("dt");
   dtDateFin.textContent = "dateFin";
   let ddDateFin = document.createElement("dd");
-  ddDateFin.textContent = pDetails.dateFin;
+  ddDateFin.textContent = pDescription.dateFin;
   dl.appendChild(dtDateFin);
   dl.appendChild(ddDateFin);
 
   let dtDureeEnNbJours = document.createElement("dt");
   dtDureeEnNbJours.textContent = "dureeEnNbJours";
   let ddDureeEnNbJours = document.createElement("dd");
-  ddDureeEnNbJours.textContent = pDetails.dureeEnNbJours;
+  ddDureeEnNbJours.textContent = pDescription.dureeEnNbJours;
   dl.appendChild(dtDureeEnNbJours);
   dl.appendChild(ddDureeEnNbJours);
 
   let dtPctComplete = document.createElement("dt");
   dtPctComplete.textContent = "pctComplete";
   let ddPctComplete = document.createElement("dd");
-  ddPctComplete.textContent = pDetails.pctComplete;
+  ddPctComplete.textContent = pDescription.pctComplete || 0;
   dl.appendChild(dtPctComplete);
   dl.appendChild(ddPctComplete);
 
@@ -75,21 +76,19 @@ export function creerCard(pDetails) {
   dtDependances.textContent = "dependances";
   let ddDependances = document.createElement("dd");
   ddDependances.classList = "mb-0";
-  ddDependances.textContent = pDetails.dependances || "null";
+  ddDependances.textContent = pDescription.dependances || "null";
   dl.appendChild(dtDependances);
   dl.appendChild(ddDependances);
 
   let divBtn = document.createElement("div");
   divBtn.classList = "d-flex justify-content-end mt-auto mb-3 me-3";
 
-  let btnSupprimer = document.createElement("button");
-  btnSupprimer.classList = "btn btn-danger";
-  btnSupprimer.textContent = "Supprimer";
-  divBtn.appendChild(btnSupprimer);
+  if (pEstAvecBouton) {
+    divBtn.appendChild(pElementHTMLBouton);
+  }
 
-  cardBody.appendChild(titreTache);
+  divTitre.appendChild(pTitre);
   cardBody.appendChild(dl);
-  divTitre.appendChild(titreTache);
   card.appendChild(imgCard);
   card.appendChild(divTitre);
   card.appendChild(cardBody);
