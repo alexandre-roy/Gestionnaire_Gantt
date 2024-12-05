@@ -91,8 +91,6 @@ function creerDonneesPourGraphique() {
     ]);
   }
 
-  
-
   options = {
     height: 275,
     gantt: {
@@ -187,7 +185,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     let frmModal = document.createElement("form");
     frmModal.classList = "row";
-    frmModal.setAttribute("novalidate", "");  
+    frmModal.setAttribute("novalidate", "");
 
     let divId = document.createElement("div");
     divId.classList = "col-12 mb-3";
@@ -274,6 +272,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputNbJours.setAttribute("type", "number");
     inputNbJours.setAttribute("id", "nbJours");
     inputNbJours.setAttribute("value", selection.dureeEnNbJours);
+    inputNbJours.setAttribute("disabled", "");
     divNbJours.appendChild(labelNbJours);
     divNbJours.appendChild(inputNbJours);
     divTemps.appendChild(divNbJours);
@@ -297,6 +296,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputRealisation.classList = "form-control bg-white";
     inputRealisation.setAttribute("type", "number");
     inputRealisation.setAttribute("id", "realisation");
+    inputRealisation.setAttribute("disabled", "");
     inputRealisation.setAttribute(
       "value",
       (selection.pctComplete / 100) * selection.dureeEnNbJours
@@ -318,7 +318,8 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputAvancement.classList = "form-control bg-white";
     inputAvancement.setAttribute("type", "text");
     inputAvancement.setAttribute("id", "avancement");
-    inputAvancement.setAttribute("value", selection.pctComplete + "%");
+    inputAvancement.setAttribute("disabled", "");
+    inputAvancement.setAttribute("value", selection.pctComplete);
     divAvancement.appendChild(labelAvancement);
     divAvancement.appendChild(inputAvancement);
     divTemps.appendChild(divAvancement);
@@ -330,7 +331,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     let divVide = document.createElement("div");
     divVide.classList = "w-25";
-    
+
     divChrono.appendChild(divVide);
 
     let btnDemarrer = document.createElement("button");
@@ -341,7 +342,10 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     let spanGo = document.createElement("span");
     spanGo.textContent = "START";
     btnDemarrer.appendChild(spanGo);
-    btnDemarrer.addEventListener("click", calculerAvancement());
+    btnDemarrer.addEventListener("click", function (e) {
+      e.preventDefault();
+      calculerAvancement();
+    });
 
     let btnArreter = document.createElement("button");
     btnArreter.classList =
@@ -351,7 +355,10 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     let spanStop = document.createElement("span");
     spanStop.textContent = "STOP";
     btnArreter.appendChild(spanStop);
-    btnArreter.addEventListener("click", arreterMinuterie());
+    btnArreter.addEventListener("click", function (e) {
+      e.preventDefault();
+      arreterMinuterie();
+    });
 
     divChrono.appendChild(btnDemarrer);
     divChrono.appendChild(btnArreter);
@@ -363,16 +370,15 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     divProgress.setAttribute("aria-valuemax", "100");
 
     let divProgressBar = document.createElement("div");
+    divProgressBar.setAttribute("id", "progressBar");
 
     if (selection.pctComplete < 50) {
       divProgressBar.classList = "progress-bar bg-danger";
     } else if (selection.pctComplete < 100) {
       divProgressBar.classList = "progress-bar bg-warning";
-    }
-    else{
+    } else {
       divProgressBar.classList = "progress-bar bg-success";
     }
-    divProgressBar.setAttribute("aria-valuenow", selection.pctComplete);
     divProgressBar.style.width = selection.pctComplete + "%";
 
     divProgress.appendChild(divProgressBar);
@@ -433,28 +439,58 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
   }
 }
 
+let timerInterval;
 
 /**
  * Cette fonction compte les secondes et les affiche dans le champ Réalisation.
  *
  * @author - alexandre-roy
  */
-function calculerAvancement() {}
+function calculerAvancement() {
+  let value = 0;
+  let realisation = document.getElementById("realisation");
+  let avancement = document.getElementById("avancement");
+  let nbJours = document.getElementById("nbJours").value;
+  let progress = document.getElementById("progressBar");
+
+  realisation.setAttribute("value", value);
+  avancement.setAttribute("value", ((value / nbJours) * 100).toFixed(0));
+  progress.style.width = ((value / nbJours) * 100).toFixed(0) + "%";
+
+  timerInterval = setInterval(() => {
+    value++;
+    let valuePct = (value / nbJours) * 100;
+    if (valuePct < 50) {
+      progress.classList = "progress-bar bg-danger";
+    } else if (valuePct < 100) {
+      progress.classList = "progress-bar bg-warning";
+    } else {
+      progress.classList = "progress-bar bg-success";
+    }
+    realisation.setAttribute("value", value);
+    avancement.setAttribute("value", valuePct.toFixed(0));
+    progress.style.width = valuePct.toFixed(0) + "%";
+    if (value == nbJours) {
+      clearInterval(timerInterval);
+    }
+  }, 1000);
+}
 
 /**
  * Cette fonction permet d'arrêter la minuterie.
  *
  * @author - alexandre-roy
  */
-function arreterMinuterie() {}
+function arreterMinuterie() {
+  clearInterval(timerInterval);
+}
 
 /**
  * Cette fonction mets à jour les données du DataTable dudiagramme de Gantt.
  *
  * @author - alexandre-roy
  */
-function sauvegarderChangementsTache() {
-}
+function sauvegarderChangementsTache() {}
 
 /**
  * Cette fonction supprime une tâche dont le Id est spécifié dans un attribut HTML personnalisé « data-id » dans les données du graphique.
@@ -463,7 +499,6 @@ function sauvegarderChangementsTache() {
  * @author - alexandre-roy
  */
 function supprimerTache(e) {
-
   let index = e.target.getAttribute("data-id");
 
   let idTache = e.target.getAttribute("idTache");
@@ -480,27 +515,28 @@ function supprimerTache(e) {
 
 /**
  * Cette fonction affiche un toast en fonction de l'action effectuée.
- * 
+ *
  * @param {boolean} pPosOuNeg - Si on veux afficher un toast positif ou négatif.
  * @author - alexandre-roy
  */
-function afficherToast(pPosOuNeg){
-  if(pPosOuNeg){
-    let toastElement = document.getElementById("toast");
-  let toastHeader = document.getElementById("toast-header");
-  toastHeader.classList = "toast-header bg-success text-white border-2 border-dark";
-  let toastTitre = document.getElementById("toast-titre");
-  toastTitre.textContent = "ACTION COMPLÉTÉE";
-  let toastBody = document.getElementById("toast-body");
-  toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
-  toastBody.textContent = "La tâche a été supprimée avec succès.";
-  let toast = new bootstrap.Toast(toastElement);
-  toast.show();
-  }
-  else{
+function afficherToast(pPosOuNeg) {
+  if (pPosOuNeg) {
     let toastElement = document.getElementById("toast");
     let toastHeader = document.getElementById("toast-header");
-    toastHeader.classList = "toast-header bg-warning text-dark border-2 border-dark";
+    toastHeader.classList =
+      "toast-header bg-success text-white border-2 border-dark";
+    let toastTitre = document.getElementById("toast-titre");
+    toastTitre.textContent = "ACTION COMPLÉTÉE";
+    let toastBody = document.getElementById("toast-body");
+    toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
+    toastBody.textContent = "La tâche a été supprimée avec succès.";
+    let toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  } else {
+    let toastElement = document.getElementById("toast");
+    let toastHeader = document.getElementById("toast-header");
+    toastHeader.classList =
+      "toast-header bg-warning text-dark border-2 border-dark";
     let toastTitre = document.getElementById("toast-titre");
     toastTitre.textContent = "ACTION IMPOSSIBLE";
     let toastBody = document.getElementById("toast-body");
