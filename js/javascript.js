@@ -44,6 +44,9 @@ function afficherCardsTaches() {
     let btnSupprimer = document.createElement("button");
     btnSupprimer.classList = "btn btn-danger";
     btnSupprimer.textContent = "Supprimer";
+    btnSupprimer.setAttribute("data-id", i);
+    btnSupprimer.setAttribute("idTache", myData.detailsTache[i].id);
+    btnSupprimer.addEventListener("click", supprimerTache);
 
     let card = utils.creerCard(
       "images/checkbox.png",
@@ -87,6 +90,8 @@ function creerDonneesPourGraphique() {
       ],
     ]);
   }
+
+  
 
   options = {
     height: 275,
@@ -143,7 +148,6 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
   function selectHandler() {
     let selection = myData.detailsTache[chart.getSelection()[0].row];
-    console.log(selection.id);
 
     let divModal = document.getElementById("modal");
 
@@ -183,6 +187,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     let frmModal = document.createElement("form");
     frmModal.classList = "row";
+    frmModal.setAttribute("novalidate", "");  
 
     let divId = document.createElement("div");
     divId.classList = "col-12 mb-3";
@@ -358,7 +363,15 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     divProgress.setAttribute("aria-valuemax", "100");
 
     let divProgressBar = document.createElement("div");
-    divProgressBar.classList = "progress-bar bg-warning";
+
+    if (selection.pctComplete < 50) {
+      divProgressBar.classList = "progress-bar bg-danger";
+    } else if (selection.pctComplete < 100) {
+      divProgressBar.classList = "progress-bar bg-warning";
+    }
+    else{
+      divProgressBar.classList = "progress-bar bg-success";
+    }
     divProgressBar.setAttribute("aria-valuenow", selection.pctComplete);
     divProgressBar.style.width = selection.pctComplete + "%";
 
@@ -388,6 +401,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     let btnFermer = document.createElement("button");
     btnFermer.classList = "btn btn-secondary text-white";
+    btnFermer.setAttribute("type", "button");
     btnFermer.setAttribute("data-bs-dismiss", "modal");
     btnFermer.textContent = "Fermer";
     btnFermer.addEventListener("click", function () {
@@ -396,26 +410,29 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
       chart.draw(data, options);
     });
 
-    let btnSauvegarder = document.createElement("button");
-    btnSauvegarder.classList = "btn btn-primary text-white";
-    btnSauvegarder.textContent = "Sauvegarder";
-    btnSauvegarder.addEventListener("click", function () {
-      sauvegarderChangementsTache;
+    let btnSave = document.createElement("input");
+    btnSave.classList = "btn btn-primary text-white";
+    btnSave.setAttribute("type", "submit");
+    btnSave.setAttribute("value", "Sauvegarder");
+    btnSave.addEventListener("click", function () {
+      frmModal.submit();
+      sauvegarderChangementsTache();
       divModal.classList.remove("show", "d-block");
       divModal.classList.add("d-none");
-      chargerEtAfficherDonneesDiagrammeEtCards();
+      chart.draw(data, options);
     });
 
     divForm.appendChild(frmModal);
 
     modalFooter.appendChild(btnFermer);
-    modalFooter.appendChild(btnSauvegarder);
+    modalFooter.appendChild(btnSave);
     modalContent.appendChild(divForm);
     modalDialog.appendChild(modalContent);
     modalContent.appendChild(modalFooter);
     divModal.appendChild(modalDialog);
   }
 }
+
 
 /**
  * Cette fonction compte les secondes et les affiche dans le champ Réalisation.
@@ -436,7 +453,8 @@ function arreterMinuterie() {}
  *
  * @author - alexandre-roy
  */
-function sauvegarderChangementsTache() {}
+function sauvegarderChangementsTache() {
+}
 
 /**
  * Cette fonction supprime une tâche dont le Id est spécifié dans un attribut HTML personnalisé « data-id » dans les données du graphique.
@@ -444,7 +462,54 @@ function sauvegarderChangementsTache() {}
  * @param {Event} e
  * @author - alexandre-roy
  */
-function supprimerTache(e) {}
+function supprimerTache(e) {
+
+  let index = e.target.getAttribute("data-id");
+
+  let idTache = e.target.getAttribute("idTache");
+
+  if (verifierSiDependanceExiste(idTache)) {
+    afficherToast(false);
+    return;
+  }
+  myData.detailsTache.splice(index, 1);
+
+  chargerEtAfficherDonneesDiagrammeEtCards();
+  afficherToast(true);
+}
+
+/**
+ * Cette fonction affiche un toast en fonction de l'action effectuée.
+ * 
+ * @param {boolean} pPosOuNeg - Si on veux afficher un toast positif ou négatif.
+ * @author - alexandre-roy
+ */
+function afficherToast(pPosOuNeg){
+  if(pPosOuNeg){
+    let toastElement = document.getElementById("toast");
+  let toastHeader = document.getElementById("toast-header");
+  toastHeader.classList = "toast-header bg-success text-white border-2 border-dark";
+  let toastTitre = document.getElementById("toast-titre");
+  toastTitre.textContent = "ACTION COMPLÉTÉE";
+  let toastBody = document.getElementById("toast-body");
+  toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
+  toastBody.textContent = "La tâche a été supprimée avec succès.";
+  let toast = new bootstrap.Toast(toastElement);
+  toast.show();
+  }
+  else{
+    let toastElement = document.getElementById("toast");
+    let toastHeader = document.getElementById("toast-header");
+    toastHeader.classList = "toast-header bg-warning text-dark border-2 border-dark";
+    let toastTitre = document.getElementById("toast-titre");
+    toastTitre.textContent = "ACTION IMPOSSIBLE";
+    let toastBody = document.getElementById("toast-body");
+    toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
+    toastBody.textContent = "D'autres tâches dépendent de celle-ci.";
+    let toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  }
+}
 
 /**
  * Fonction d'initialisation de la page.
