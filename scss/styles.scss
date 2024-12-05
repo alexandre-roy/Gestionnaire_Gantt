@@ -1,6 +1,7 @@
 /** VOS $VARIABLES Sass ici avant l'importation**/
 $primary: #5e97f6;
 $secondary: #f28500;
+$warning: #0066cc;
 $body-bg: #dae2e0;
 $info: #dae2e0;
 $light: #aabdca;
@@ -27,4 +28,16 @@ $font-family-base: "Roboto";
 
 .w-15{
   width: 15%;
+}
+
+.w-26{
+  width: 26%;
+}
+
+.ms-4-5{
+  margin-left: 1.85rem;
+}
+
+.me-2-5{
+  margin-right: 1rem;
 }

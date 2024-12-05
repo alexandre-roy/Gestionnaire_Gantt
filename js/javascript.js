@@ -227,7 +227,10 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputDateDebut.classList = "form-control bg-white";
     inputDateDebut.setAttribute("type", "date");
     inputDateDebut.setAttribute("id", "dateDebut");
-    inputDateDebut.setAttribute("value", selection.dateDebut.toISOString().split("T")[0]);
+    inputDateDebut.setAttribute(
+      "value",
+      selection.dateDebut.toISOString().split("T")[0]
+    );
     divDateDebut.appendChild(labelDateDebut);
     divDateDebut.appendChild(inputDateDebut);
     divDates.appendChild(divDateDebut);
@@ -242,7 +245,10 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputDateFin.classList = "form-control bg-white";
     inputDateFin.setAttribute("type", "date");
     inputDateFin.setAttribute("id", "dateFin");
-    inputDateFin.setAttribute("value", selection.dateFin.toISOString().split("T")[0]);
+    inputDateFin.setAttribute(
+      "value",
+      selection.dateFin.toISOString().split("T")[0]
+    );
     divDateFin.appendChild(labelDateFin);
     divDateFin.appendChild(inputDateFin);
     divDates.appendChild(divDateFin);
@@ -286,7 +292,10 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputRealisation.classList = "form-control bg-white";
     inputRealisation.setAttribute("type", "number");
     inputRealisation.setAttribute("id", "realisation");
-    inputRealisation.setAttribute("value", selection.pctComplete / 100 * selection.dureeEnNbJours);
+    inputRealisation.setAttribute(
+      "value",
+      (selection.pctComplete / 100) * selection.dureeEnNbJours
+    );
 
     divRealisation.appendChild(labelRealisation);
     divInputGroup.appendChild(spanInputGroupText);
@@ -312,20 +321,27 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     frmModal.appendChild(divTemps);
 
     let divChrono = document.createElement("div");
-    divChrono.classList = "d-flex justify-content-center";
+    divChrono.classList = "d-flex justify-content-around";
+
+    let divVide = document.createElement("div");
+    divVide.classList = "w-25";
+    
+    divChrono.appendChild(divVide);
 
     let btnDemarrer = document.createElement("button");
-    btnDemarrer.classList = "btn btn-success me-3 d-flex flex-column align-items-center w-15";
+    btnDemarrer.classList =
+      "btn btn-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
     let start = spanInputGroupTextIcon.cloneNode(true);
     btnDemarrer.appendChild(start);
     let spanGo = document.createElement("span");
     spanGo.textContent = "START";
-    btnDemarrer.appendChild(spanGo);   
+    btnDemarrer.appendChild(spanGo);
     btnDemarrer.addEventListener("click", calculerAvancement());
 
     let btnArreter = document.createElement("button");
-    btnArreter.classList = "btn btn-danger d-flex flex-column align-items-center w-15";
-    let stop  = spanInputGroupTextIcon.cloneNode(true);
+    btnArreter.classList =
+      "btn btn-danger d-flex flex-column align-items-center w-15 me-3";
+    let stop = spanInputGroupTextIcon.cloneNode(true);
     btnArreter.appendChild(stop);
     let spanStop = document.createElement("span");
     spanStop.textContent = "STOP";
@@ -334,6 +350,21 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     divChrono.appendChild(btnDemarrer);
     divChrono.appendChild(btnArreter);
+
+    let divProgress = document.createElement("div");
+    divProgress.classList = "progress w-25 me-1 ms-2";
+    divProgress.setAttribute("role", "progressbar");
+    divProgress.setAttribute("aria-valuemin", "0");
+    divProgress.setAttribute("aria-valuemax", "100");
+
+    let divProgressBar = document.createElement("div");
+    divProgressBar.classList = "progress-bar bg-warning";
+    divProgressBar.setAttribute("aria-valuenow", selection.pctComplete);
+    divProgressBar.style.width = selection.pctComplete + "%";
+
+    divProgress.appendChild(divProgressBar);
+    divProgress.appendChild(divProgressBar);
+    divChrono.appendChild(divProgress);
 
     frmModal.appendChild(divChrono);
 
@@ -369,10 +400,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     btnSauvegarder.classList = "btn btn-primary text-white";
     btnSauvegarder.textContent = "Sauvegarder";
     btnSauvegarder.addEventListener("click", function () {
-
-    myData.detailsTache[chart.getSelection()[0].row].id = inputId.value;
-    myData.detailsTache[chart.getSelection()[0].row].titre = inputTitre.value;
-
+      sauvegarderChangementsTache;
       divModal.classList.remove("show", "d-block");
       divModal.classList.add("d-none");
       chargerEtAfficherDonneesDiagrammeEtCards();
