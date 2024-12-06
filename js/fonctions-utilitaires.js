@@ -18,7 +18,7 @@ export function creerCard(pImage, pTitre, pDescription, pEstAvecBouton,
   card.classList = "card shadow bg-white rounded-4 card-tache m-2";
 
   let imgCard = document.createElement("img");
-  imgCard.className = "card-img-top";
+  imgCard.className = "card-img-top animation";
   imgCard.src = pImage;
   imgCard.classList = "w-50";
 
@@ -106,7 +106,7 @@ export function creerCard(pImage, pTitre, pDescription, pEstAvecBouton,
  * @author - alexandre-roy
  */
 export function convertirJoursEnMillisecondes(pNbJours) {
-  return pNbJours * 24 * 60 * 60 * 1000;
+  return pNbJours * 1000;
 }
 
 /**
@@ -117,5 +117,5 @@ export function convertirJoursEnMillisecondes(pNbJours) {
  * @author - alexandre-roy
  */
 export function convertirMillisecondesEnJours(pNbMillisecondes) {
-  return pNbMillisecondes / 24 / 60 / 60 / 1000;
+  return pNbMillisecondes / 1000;
 }

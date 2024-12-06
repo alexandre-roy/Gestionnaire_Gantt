@@ -13,6 +13,7 @@ let myData = DATA_TACHES;
 let data;
 let options;
 let chart;
+let grandeur = 275;
 
 /**
  * Fonction qui met en place le visuel de la page.
@@ -36,7 +37,7 @@ function afficherCardsTaches() {
   rowCards.classList = "row";
   rowCards.textContent = "";
 
-  for (const i in myData.detailsTache) {
+  for (let i in myData.detailsTache) {
     let titreTache = document.createElement("h2");
     titreTache.classList = "card-title fs-5";
     titreTache.textContent = `${myData.detailsTache[i].id}: ${myData.detailsTache[i].titre}`;
@@ -92,7 +93,7 @@ function creerDonneesPourGraphique() {
   }
 
   options = {
-    height: 275,
+    height: grandeur,
     gantt: {
       criticalPathEnabled: false,
       arrow: {
@@ -165,7 +166,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
 
     let modalTitle = document.createElement("h5");
     modalTitle.classList = "modal-title";
-    modalTitle.textContent = "Édition d'une tâche";
+    modalTitle.textContent = "Modification d'une tâche";
 
     let btnX = document.createElement("button");
     btnX.classList = "btn-close";
@@ -228,11 +229,11 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     labelDateDebut.textContent = "Date de début";
     let inputDateDebut = document.createElement("input");
     inputDateDebut.classList = "form-control bg-white";
-    inputDateDebut.setAttribute("type", "date");
+    inputDateDebut.setAttribute("type", "datetime-local");
     inputDateDebut.setAttribute("id", "dateDebut");
     inputDateDebut.setAttribute(
       "value",
-      selection.dateDebut.toISOString().split("T")[0]
+      selection.dateDebut.toISOString().slice(0, 16)
     );
     divDateDebut.appendChild(labelDateDebut);
     divDateDebut.appendChild(inputDateDebut);
@@ -246,11 +247,11 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     labelDateFin.textContent = "Date de fin";
     let inputDateFin = document.createElement("input");
     inputDateFin.classList = "form-control bg-white";
-    inputDateFin.setAttribute("type", "date");
+    inputDateFin.setAttribute("type", "datetime-local");
     inputDateFin.setAttribute("id", "dateFin");
     inputDateFin.setAttribute(
       "value",
-      selection.dateFin.toISOString().split("T")[0]
+      selection.dateFin.toISOString().slice(0, 16)
     );
     divDateFin.appendChild(labelDateFin);
     divDateFin.appendChild(inputDateFin);
@@ -299,7 +300,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     inputRealisation.setAttribute("disabled", "");
     inputRealisation.setAttribute(
       "value",
-      (selection.pctComplete / 100) * selection.dureeEnNbJours
+      ((selection.pctComplete / 100) * selection.dureeEnNbJours).toFixed(0)
     );
 
     divRealisation.appendChild(labelRealisation);
@@ -335,8 +336,14 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     divChrono.appendChild(divVide);
 
     let btnDemarrer = document.createElement("button");
-    btnDemarrer.classList =
-      "btn btn-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
+    btnDemarrer.setAttribute("id", "btnStart");
+    if (selection.pctComplete == 100) {
+      btnDemarrer.classList =
+        "btn btn-white border-2 border-success text-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
+    } else {
+      btnDemarrer.classList =
+        "btn btn-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
+    }
     let start = spanInputGroupTextIcon.cloneNode(true);
     btnDemarrer.appendChild(start);
     let spanGo = document.createElement("span");
@@ -348,8 +355,9 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     });
 
     let btnArreter = document.createElement("button");
+    btnArreter.setAttribute("id", "btnStop");
     btnArreter.classList =
-      "btn btn-danger d-flex flex-column align-items-center w-15 me-3";
+      "btn btn-white border-2 border-danger text-danger d-flex flex-column align-items-center w-15 me-3";
     let stop = spanInputGroupTextIcon.cloneNode(true);
     btnArreter.appendChild(stop);
     let spanStop = document.createElement("span");
@@ -416,12 +424,19 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
       chart.draw(data, options);
     });
 
-    let btnSave = document.createElement("input");
+    let btnSave = document.createElement("button");
     btnSave.classList = "btn btn-primary text-white";
-    btnSave.setAttribute("type", "submit");
-    btnSave.setAttribute("value", "Sauvegarder");
+    btnSave.setAttribute("type", "button");
+    btnSave.textContent = "Sauvegarder";
     btnSave.addEventListener("click", function () {
-      frmModal.submit();
+      if(inputDateFin.value < inputDateDebut.value) {
+        afficherToast("form", "date");
+        return;
+      }
+      if(inputId.value == "" || inputTitre.value == "") {
+        afficherToast("form", "vide");
+        return;
+      }
       sauvegarderChangementsTache();
       divModal.classList.remove("show", "d-block");
       divModal.classList.add("d-none");
@@ -447,33 +462,44 @@ let timerInterval;
  * @author - alexandre-roy
  */
 function calculerAvancement() {
-  let value = 0;
   let realisation = document.getElementById("realisation");
+  let value = realisation.getAttribute("value");
   let avancement = document.getElementById("avancement");
   let nbJours = document.getElementById("nbJours").value;
   let progress = document.getElementById("progressBar");
+
+  let btnDemarrer = document.getElementById("btnStart");
+  btnDemarrer.classList =
+    "btn btn-white border-2 border-success text-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
 
   realisation.setAttribute("value", value);
   avancement.setAttribute("value", ((value / nbJours) * 100).toFixed(0));
   progress.style.width = ((value / nbJours) * 100).toFixed(0) + "%";
 
-  timerInterval = setInterval(() => {
-    value++;
-    let valuePct = (value / nbJours) * 100;
-    if (valuePct < 50) {
-      progress.classList = "progress-bar bg-danger";
-    } else if (valuePct < 100) {
-      progress.classList = "progress-bar bg-warning";
-    } else {
-      progress.classList = "progress-bar bg-success";
-    }
-    realisation.setAttribute("value", value);
-    avancement.setAttribute("value", valuePct.toFixed(0));
-    progress.style.width = valuePct.toFixed(0) + "%";
-    if (value == nbJours) {
-      clearInterval(timerInterval);
-    }
-  }, 1000);
+  if (progress.style.width != "100%") {
+    let btnArreter = document.getElementById("btnStop");
+    btnArreter.classList =
+      "btn btn-danger d-flex flex-column align-items-center w-15 me-3";
+    timerInterval = setInterval(() => {
+      value++;
+      let valuePct = (value / nbJours) * 100;
+      if (valuePct < 50) {
+        progress.classList = "progress-bar bg-danger";
+      } else if (valuePct < 100) {
+        progress.classList = "progress-bar bg-warning";
+      } else {
+        progress.classList = "progress-bar bg-success";
+      }
+      realisation.setAttribute("value", value);
+      avancement.setAttribute("value", valuePct.toFixed(0));
+      progress.style.width = valuePct.toFixed(0) + "%";
+      if (value == nbJours) {
+        clearInterval(timerInterval);
+        btnArreter.classList =
+          "btn btn-white border-2 border-danger text-danger d-flex flex-column align-items-center w-15 me-3";
+      }
+    }, utils.convertirJoursEnMillisecondes(1));
+  }
 }
 
 /**
@@ -483,6 +509,15 @@ function calculerAvancement() {
  */
 function arreterMinuterie() {
   clearInterval(timerInterval);
+  let progress = document.getElementById("progressBar");
+  if (progress.style.width != "100%") {
+    let btnDemarrer = document.getElementById("btnStart");
+    btnDemarrer.classList =
+      "btn btn-success me-2-5 d-flex flex-column align-items-center w-15 ms-4-5";
+  }
+  let btnArreter = document.getElementById("btnStop");
+  btnArreter.classList =
+    "btn btn-white border-2 border-danger text-danger d-flex flex-column align-items-center w-15 me-3";
 }
 
 /**
@@ -490,7 +525,28 @@ function arreterMinuterie() {
  *
  * @author - alexandre-roy
  */
-function sauvegarderChangementsTache() {}
+function sauvegarderChangementsTache() {
+  let id = document.getElementById("id").value;
+  let titre = document.getElementById("titre").value;
+  let dateDebut = new Date(document.getElementById("dateDebut").value);
+  let dateFin = new Date(document.getElementById("dateFin").value);
+  let avancement = Number(document.getElementById("avancement").value);
+  let dependances = document.getElementById("dependances").value;
+
+ for (let i = 0; i < myData.detailsTache.length; i++) {
+  if (myData.detailsTache[i].id === id) {
+    myData.detailsTache[i].titre = titre;
+    myData.detailsTache[i].dateDebut = dateDebut;
+    myData.detailsTache[i].dateFin = dateFin;
+    myData.detailsTache[i].dureeEnNbJours = dateFin.getDate() - dateDebut.getDate();
+    myData.detailsTache[i].pctComplete = avancement;
+    myData.detailsTache[i].dependances = dependances ? dependances.split(",") : null;
+    break;
+  }
+}
+
+chargerEtAfficherDonneesDiagrammeEtCards();
+}
 
 /**
  * Cette fonction supprime une tâche dont le Id est spécifié dans un attribut HTML personnalisé « data-id » dans les données du graphique.
@@ -504,35 +560,36 @@ function supprimerTache(e) {
   let idTache = e.target.getAttribute("idTache");
 
   if (verifierSiDependanceExiste(idTache)) {
-    afficherToast(false);
+    afficherToast("negatif");
     return;
   }
   myData.detailsTache.splice(index, 1);
 
+  grandeur -= 45;
   chargerEtAfficherDonneesDiagrammeEtCards();
-  afficherToast(true);
+  afficherToast("positif");
 }
 
 /**
  * Cette fonction affiche un toast en fonction de l'action effectuée.
  *
- * @param {boolean} pPosOuNeg - Si on veux afficher un toast positif ou négatif.
+ * @param {string} pToast - Si on veux afficher un toast positif ou négatif.
  * @author - alexandre-roy
  */
-function afficherToast(pPosOuNeg) {
-  if (pPosOuNeg) {
+function afficherToast(pToast, pMessage) {
+  if (pToast == "positif") {
     let toastElement = document.getElementById("toast");
     let toastHeader = document.getElementById("toast-header");
     toastHeader.classList =
-      "toast-header bg-success text-white border-2 border-dark";
+      "toast-header bg-success text-white border-2 border-dark rounded-top-1";
     let toastTitre = document.getElementById("toast-titre");
     toastTitre.textContent = "ACTION COMPLÉTÉE";
     let toastBody = document.getElementById("toast-body");
-    toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
+    toastBody.classList = "toast-body bg-white text-dark rounded-bottom-2";
     toastBody.textContent = "La tâche a été supprimée avec succès.";
     let toast = new bootstrap.Toast(toastElement);
     toast.show();
-  } else {
+  } else if (pToast == "negatif") {
     let toastElement = document.getElementById("toast");
     let toastHeader = document.getElementById("toast-header");
     toastHeader.classList =
@@ -542,6 +599,26 @@ function afficherToast(pPosOuNeg) {
     let toastBody = document.getElementById("toast-body");
     toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
     toastBody.textContent = "D'autres tâches dépendent de celle-ci.";
+    let toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  }
+  else if (pToast == "form"){
+    let toastElement = document.getElementById("toast");
+    let toastHeader = document.getElementById("toast-header");
+    toastHeader.classList =
+      "toast-header bg-warning text-dark border-2 border-dark";
+    let toastTitre = document.getElementById("toast-titre");
+    toastTitre.textContent = "ACTION IMPOSSIBLE";
+    let toastBody = document.getElementById("toast-body");
+    toastBody.classList = "toast-body bg-white text-dark rounded-bottom-1";
+    if(pMessage == "vide")
+    {
+      toastBody.textContent = "Veuillez remplir tous les champs.";
+    }  
+    else if(pMessage == "date")
+    {
+      toastBody.textContent = "La date de fin doit être supérieure à la date de début.";
+    } 
     let toast = new bootstrap.Toast(toastElement);
     toast.show();
   }
