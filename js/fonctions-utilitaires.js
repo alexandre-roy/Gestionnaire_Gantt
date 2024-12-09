@@ -18,9 +18,9 @@ export function creerCard(pImage, pTitre, pDescription, pEstAvecBouton,
   card.classList = "card shadow bg-white rounded-4 card-tache m-2";
 
   let imgCard = document.createElement("img");
-  imgCard.className = "card-img-top animation";
   imgCard.src = pImage;
-  imgCard.classList = "w-50";
+  imgCard.alt = "checkbox";
+  imgCard.classList = "card-img-top w-50 animcheck";
 
   let divTitre = document.createElement("div");
   divTitre.classList = "mx-3";

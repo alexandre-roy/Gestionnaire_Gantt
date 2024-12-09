@@ -42,12 +42,20 @@ function afficherCardsTaches() {
     titreTache.classList = "card-title fs-5";
     titreTache.textContent = `${myData.detailsTache[i].id}: ${myData.detailsTache[i].titre}`;
 
-    let btnSupprimer = document.createElement("button");
+    let arialabel = document.createElement("span");
+    arialabel.classList = "visually-hidden";
+    arialabel.textContent = "Supprimer la tâche";
+    arialabel.setAttribute("id", "descSupprimer");
+
+    let btnSupprimer = document.createElement("button"); 
     btnSupprimer.classList = "btn btn-danger";
     btnSupprimer.textContent = "Supprimer";
     btnSupprimer.setAttribute("data-id", i);
+    btnSupprimer.setAttribute("id", "btnSupprimer");
+    btnSupprimer.setAttribute("aria-labelledby", "descSupprimer");
     btnSupprimer.setAttribute("idTache", myData.detailsTache[i].id);
     btnSupprimer.addEventListener("click", supprimerTache);
+    btnSupprimer.appendChild(arialabel);
 
     let card = utils.creerCard(
       "images/checkbox.png",

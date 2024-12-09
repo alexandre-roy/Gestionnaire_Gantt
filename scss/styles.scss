@@ -40,3 +40,13 @@ $font-family-base: "Roboto";
 .me-2-5{
   margin-right: 1rem;
 }
+
+.animcheck {
+  transition: transform 0.5s ease-in-out;
+}
+
+.animcheck:hover {
+    transform:translate(50%);
+    transition-duration: 1s;
+    transition-timing-function:ease-in-out;
+}
