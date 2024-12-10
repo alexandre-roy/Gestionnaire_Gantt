@@ -177,7 +177,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
     modalTitle.textContent = "Modification d'une tâche";
 
     let btnX = document.createElement("button");
-    btnX.classList = "btn-close";
+    btnX.classList = "btn-close animmodal";
     btnX.setAttribute("data-bs-dismiss", "modal");
     btnX.addEventListener("click", function () {
       divModal.classList.remove("show", "d-block");

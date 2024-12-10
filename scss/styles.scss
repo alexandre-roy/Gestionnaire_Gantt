@@ -1,4 +1,4 @@
-/** VOS $VARIABLES Sass ici avant l'importation**/
+/** $VARIABLES SASS ici avant l'importation **/
 $primary: #5e97f6;
 $secondary: #f28500;
 $body-bg: #dae2e0;
@@ -11,7 +11,7 @@ $headings-font-family: "Oswald";
 /* POLICE DU TEXTE */
 $font-family-base: "Roboto";
 
-/*** Importation de Boostrap + POLICES **/
+/*** Importation de Boostrap + POLICES ***/
 @import "partials/bootstrap";
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
@@ -41,12 +41,21 @@ $font-family-base: "Roboto";
   margin-right: 1rem;
 }
 
+/* ANIMATIONS */
 .animcheck {
-  transition: transform 0.5s ease-in-out;
+  transition: transform 0.7s ease-in-out;
 }
 
 .animcheck:hover {
-    transform:translate(50%);
-    transition-duration: 1s;
+    transform: translate(50%);
+    transition-duration: 0.7s;
     transition-timing-function:ease-in-out;
+}
+
+.animmodal {
+  transition: transform 0.3s ease-in-out;
+}
+
+.animmodal:hover {
+  transform: rotate(90deg);
 }
