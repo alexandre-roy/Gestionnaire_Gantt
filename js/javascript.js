@@ -8,8 +8,6 @@ import * as utils from "./fonctions-utilitaires.js";
 /*global google*/
 /*global bootstrap*/
 
-let myData = DATA_TACHES;
-
 let data;
 let options;
 let chart;
@@ -37,10 +35,10 @@ function afficherCardsTaches() {
   rowCards.classList = "row";
   rowCards.textContent = "";
 
-  for (let i in myData.detailsTache) {
+  for (let i in DATA_TACHES.detailsTache) {
     let titreTache = document.createElement("h2");
     titreTache.classList = "card-title fs-5";
-    titreTache.textContent = `${myData.detailsTache[i].id}: ${myData.detailsTache[i].titre}`;
+    titreTache.textContent = `${DATA_TACHES.detailsTache[i].id}: ${DATA_TACHES.detailsTache[i].titre}`;
 
     let arialabel = document.createElement("span");
     arialabel.classList = "visually-hidden";
@@ -53,14 +51,14 @@ function afficherCardsTaches() {
     btnSupprimer.setAttribute("data-id", i);
     btnSupprimer.setAttribute("id", "btnSupprimer");
     btnSupprimer.setAttribute("aria-labelledby", "descSupprimer");
-    btnSupprimer.setAttribute("idTache", myData.detailsTache[i].id);
+    btnSupprimer.setAttribute("idTache", DATA_TACHES.detailsTache[i].id);
     btnSupprimer.addEventListener("click", supprimerTache);
     btnSupprimer.appendChild(arialabel);
 
     let card = utils.creerCard(
       "images/checkbox.png",
       titreTache,
-      myData.detailsTache[i],
+      DATA_TACHES.detailsTache[i],
       true,
       btnSupprimer
     );
@@ -84,17 +82,17 @@ function creerDonneesPourGraphique() {
   data.addColumn("number", "% complétée");
   data.addColumn("string", "Dépendances");
 
-  for (const i in myData.detailsTache) {
+  for (const i in DATA_TACHES.detailsTache) {
     data.addRows([
       [
-        myData.detailsTache[i].id,
-        myData.detailsTache[i].titre,
-        myData.detailsTache[i].dateDebut,
-        myData.detailsTache[i].dateFin,
-        myData.detailsTache[i].dureeEnNbJours,
-        myData.detailsTache[i].pctComplete,
-        myData.detailsTache[i].dependances
-          ? String(myData.detailsTache[i].dependances)
+        DATA_TACHES.detailsTache[i].id,
+        DATA_TACHES.detailsTache[i].titre,
+        DATA_TACHES.detailsTache[i].dateDebut,
+        DATA_TACHES.detailsTache[i].dateFin,
+        DATA_TACHES.detailsTache[i].dureeEnNbJours,
+        DATA_TACHES.detailsTache[i].pctComplete,
+        DATA_TACHES.detailsTache[i].dependances
+          ? String(DATA_TACHES.detailsTache[i].dependances)
           : null,
       ],
     ]);
@@ -132,7 +130,7 @@ function creerDonneesPourGraphique() {
  * @author - alexandre-roy
  */
 function verifierSiDependanceExiste(pIdTache) {
-  for (const tache of myData.detailsTache) {
+  for (const tache of DATA_TACHES.detailsTache) {
     if (tache.dependances == null) {
       continue;
     }
@@ -154,7 +152,7 @@ function recupererTacheSelectionneeDansDiagrammeDeGantt() {
   google.visualization.events.addListener(chart, "select", selectHandler);
 
   function selectHandler() {
-    let selection = myData.detailsTache[chart.getSelection()[0].row];
+    let selection = DATA_TACHES.detailsTache[chart.getSelection()[0].row];
 
     let divModal = document.getElementById("modal");
 
@@ -541,14 +539,14 @@ function sauvegarderChangementsTache() {
   let avancement = Number(document.getElementById("avancement").value);
   let dependances = document.getElementById("dependances").value;
 
- for (let i = 0; i < myData.detailsTache.length; i++) {
-  if (myData.detailsTache[i].id === id) {
-    myData.detailsTache[i].titre = titre;
-    myData.detailsTache[i].dateDebut = dateDebut;
-    myData.detailsTache[i].dateFin = dateFin;
-    myData.detailsTache[i].dureeEnNbJours = dateFin.getDate() - dateDebut.getDate();
-    myData.detailsTache[i].pctComplete = avancement;
-    myData.detailsTache[i].dependances = dependances ? dependances.split(",") : null;
+ for (let i = 0; i < DATA_TACHES.detailsTache.length; i++) {
+  if (DATA_TACHES.detailsTache[i].id === id) {
+    DATA_TACHES.detailsTache[i].titre = titre;
+    DATA_TACHES.detailsTache[i].dateDebut = dateDebut;
+    DATA_TACHES.detailsTache[i].dateFin = dateFin;
+    DATA_TACHES.detailsTache[i].dureeEnNbJours = dateFin.getDate() - dateDebut.getDate();
+    DATA_TACHES.detailsTache[i].pctComplete = avancement;
+    DATA_TACHES.detailsTache[i].dependances = dependances ? dependances.split(",") : null;
     break;
   }
 }
@@ -571,7 +569,7 @@ function supprimerTache(e) {
     afficherToast("negatif");
     return;
   }
-  myData.detailsTache.splice(index, 1);
+  DATA_TACHES.detailsTache.splice(index, 1);
 
   grandeur -= 45;
   chargerEtAfficherDonneesDiagrammeEtCards();
